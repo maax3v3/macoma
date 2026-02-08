@@ -238,7 +238,7 @@ type testImage struct {
 }
 
 func (ti *testImage) ColorModel() color.Model { return color.RGBAModel }
-func (ti *testImage) Bounds() image.Rectangle  { return image.Rect(0, 0, ti.w, ti.h) }
+func (ti *testImage) Bounds() image.Rectangle { return image.Rect(0, 0, ti.w, ti.h) }
 func (ti *testImage) At(x, y int) color.Color {
 	if c, ok := ti.data[image.Point{X: x, Y: y}]; ok {
 		return c
@@ -267,10 +267,10 @@ func TestComputeZoneColors(t *testing.T) {
 	if len(zc.Colors) != 2 {
 		t.Fatalf("expected 2 colors, got %d", len(zc.Colors))
 	}
-	if zc.Colors[0] != (mcol.RGBA{255, 0, 0, 255}) {
+	if zc.Colors[0] != (mcol.RGBA{R: 255, G: 0, B: 0, A: 255}) {
 		t.Errorf("zone 0 color: got %+v, want red", zc.Colors[0])
 	}
-	if zc.Colors[1] != (mcol.RGBA{0, 0, 255, 255}) {
+	if zc.Colors[1] != (mcol.RGBA{R: 0, G: 0, B: 255, A: 255}) {
 		t.Errorf("zone 1 color: got %+v, want blue", zc.Colors[1])
 	}
 }

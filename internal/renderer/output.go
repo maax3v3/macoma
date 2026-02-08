@@ -45,7 +45,7 @@ func Render(
 	srcH := bounds.Dy()
 
 	// Calculate legend dimensions
-	legendHeight := calculateLegendHeight(cm, font, cfg, srcW)
+	legendHeight := calculateLegendHeight(cm, cfg, srcW)
 	totalH := srcH + legendHeight
 
 	out := image.NewRGBA(image.Rect(0, 0, srcW, totalH))
@@ -120,7 +120,7 @@ func computeFontSize(imgW, imgH, numZones int) int {
 	return size
 }
 
-func calculateLegendHeight(cm *aggregation.ColorMap, font FontRenderer, cfg Config, imgW int) int {
+func calculateLegendHeight(cm *aggregation.ColorMap, cfg Config, imgW int) int {
 	if len(cm.Entries) == 0 {
 		return 0
 	}

@@ -269,9 +269,8 @@ func TestComputeFontSize(t *testing.T) {
 
 func TestCalculateLegendHeight_NoEntries(t *testing.T) {
 	cm := &aggregation.ColorMap{}
-	font := NewBitmapFont()
 	cfg := DefaultConfig()
-	h := calculateLegendHeight(cm, font, cfg, 200)
+	h := calculateLegendHeight(cm, cfg, 200)
 	if h != 0 {
 		t.Errorf("expected 0 legend height for no entries, got %d", h)
 	}
@@ -280,13 +279,12 @@ func TestCalculateLegendHeight_NoEntries(t *testing.T) {
 func TestCalculateLegendHeight_WithEntries(t *testing.T) {
 	cm := &aggregation.ColorMap{
 		Entries: []aggregation.ColorEntry{
-			{Number: 1, Color: mcol.RGBA{255, 0, 0, 255}},
-			{Number: 2, Color: mcol.RGBA{0, 255, 0, 255}},
+			{Number: 1, Color: mcol.RGBA{R: 255, G: 0, B: 0, A: 255}},
+			{Number: 2, Color: mcol.RGBA{R: 0, G: 255, B: 0, A: 255}},
 		},
 	}
-	font := NewBitmapFont()
 	cfg := DefaultConfig()
-	h := calculateLegendHeight(cm, font, cfg, 200)
+	h := calculateLegendHeight(cm, cfg, 200)
 	if h <= 0 {
 		t.Errorf("expected positive legend height, got %d", h)
 	}
