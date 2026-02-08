@@ -16,14 +16,16 @@ func main() {
 	}
 
 	opts := macoma.Options{
-		DelimiterColor: macoma.Color{
-			R: cfg.DelimiterColor.R,
-			G: cfg.DelimiterColor.G,
-			B: cfg.DelimiterColor.B,
-			A: cfg.DelimiterColor.A,
+		DelimiterStrategy: cfg.DelimiterStrategy,
+		BorderDelimiterColor: macoma.Color{
+			R: cfg.BorderDelimiterColor.R,
+			G: cfg.BorderDelimiterColor.G,
+			B: cfg.BorderDelimiterColor.B,
+			A: cfg.BorderDelimiterColor.A,
 		},
-		DelimiterTolerance: cfg.DelimiterTolerance,
-		MaxColors:          cfg.MaxColors,
+		BorderDelimiterTolerance: cfg.BorderDelimiterTolerance,
+		ColorDelimiterTolerance:  cfg.ColorDelimiterTolerance,
+		MaxColors:                cfg.MaxColors,
 	}
 
 	fmt.Printf("Loading image: %s\n", cfg.InPath)
@@ -34,7 +36,7 @@ func main() {
 	}
 	fmt.Printf("Image loaded: %dx%d\n", img.Bounds().Dx(), img.Bounds().Dy())
 
-	fmt.Println("Converting...")
+	fmt.Printf("Converting (strategy=%s)...\n", opts.DelimiterStrategy)
 	result, err := macoma.Convert(img, opts)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)

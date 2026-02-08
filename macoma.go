@@ -27,16 +27,34 @@ import (
 	"github.com/maax3v3/macoma/internal/zone"
 )
 
+// Delimiter strategy constants.
+const (
+	StrategyBorder = "border" // Detect borders by matching a specific color.
+	StrategyColor  = "color"  // Detect borders by color differences between neighbors.
+)
+
 // Options configures the magic coloring conversion.
 type Options struct {
-	// DelimiterColor is the color used for drawing delimiter lines.
-	// Default: black (#000000).
-	DelimiterColor Color
+	// DelimiterStrategy selects how zones are delimited.
+	// "border" matches a specific border color; "color" uses neighbor color
+	// differences. Default: "color".
+	DelimiterStrategy string
 
-	// DelimiterTolerance is the tolerance percentage (0–100) for matching
-	// the delimiter color. Higher values match more colors as delimiters.
+	// BorderDelimiterColor is the color of the delimiter lines.
+	// Only used when DelimiterStrategy is "border".
+	// Default: black (#000000).
+	BorderDelimiterColor Color
+
+	// BorderDelimiterTolerance is the tolerance percentage (0–100) for
+	// matching the border color. Only used when DelimiterStrategy is "border".
 	// Default: 10.
-	DelimiterTolerance float64
+	BorderDelimiterTolerance float64
+
+	// ColorDelimiterTolerance is the color difference threshold percentage
+	// (0–100) from which two neighboring pixels are considered different
+	// sections. Only used when DelimiterStrategy is "color".
+	// Default: 10.
+	ColorDelimiterTolerance float64
 
 	// MaxColors is the maximum number of distinct colors in the output.
 	// 0 means unlimited.
@@ -68,9 +86,11 @@ type FontRenderer interface {
 // DefaultOptions returns Options with sensible defaults.
 func DefaultOptions() Options {
 	return Options{
-		DelimiterColor:     Color{0, 0, 0, 255},
-		DelimiterTolerance: 10,
-		MaxColors:          10,
+		DelimiterStrategy:        StrategyColor,
+		BorderDelimiterColor:     Color{0, 0, 0, 255},
+		BorderDelimiterTolerance: 10,
+		ColorDelimiterTolerance:  10,
+		MaxColors:                10,
 	}
 }
 
@@ -101,10 +121,11 @@ func Convert(img image.Image, opts Options) (*image.RGBA, error) {
 		return nil, fmt.Errorf("input image is nil")
 	}
 
-	dc := color.RGBA{R: opts.DelimiterColor.R, G: opts.DelimiterColor.G, B: opts.DelimiterColor.B, A: opts.DelimiterColor.A}
+	// Build the appropriate delimiter strategy
+	delim := delimiterFromOpts(opts)
 
 	// Detect delimiter pixels
-	dm := detection.Detect(img, dc, opts.DelimiterTolerance)
+	dm := delim.Detect(img)
 
 	// Find zones via flood-fill
 	zones, labels := zone.FindZones(dm)
@@ -166,6 +187,24 @@ func (a *fontAdapter) DrawString(img *image.RGBA, text string, cx, cy int, col s
 
 func (a *fontAdapter) MeasureString(text string, size int) (int, int) {
 	return a.f.MeasureString(text, size)
+}
+
+// delimiterFromOpts builds the appropriate Delimiter from public Options.
+func delimiterFromOpts(opts Options) detection.Delimiter {
+	if opts.DelimiterStrategy == StrategyBorder {
+		return &detection.BorderDelimiter{
+			Color: color.RGBA{
+				R: opts.BorderDelimiterColor.R,
+				G: opts.BorderDelimiterColor.G,
+				B: opts.BorderDelimiterColor.B,
+				A: opts.BorderDelimiterColor.A,
+			},
+			TolerancePct: opts.BorderDelimiterTolerance,
+		}
+	}
+	return &detection.ColorDelimiter{
+		TolerancePct: opts.ColorDelimiterTolerance,
+	}
 }
 
 func scaleLegendConfig(cfg *renderer.Config, bounds image.Rectangle) {

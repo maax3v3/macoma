@@ -57,16 +57,16 @@ func Render(
 		}
 	}
 
-	// Draw delimiter pixels in their original color (typically black)
+	// Draw delimiter pixels as black (zone borders)
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		black := color.RGBA{0, 0, 0, 255}
 		for y := 0; y < srcH; y++ {
 			for x := 0; x < srcW; x++ {
 				if dm.At(x, y) {
-					c := srcImg.At(bounds.Min.X+x, bounds.Min.Y+y)
-					out.Set(x, y, c)
+					out.SetRGBA(x, y, black)
 				}
 			}
 		}

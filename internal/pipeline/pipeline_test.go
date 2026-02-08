@@ -81,11 +81,12 @@ func TestPipelineEndToEnd(t *testing.T) {
 	createTestImage(t, inPath)
 
 	cfg := cli.Config{
-		InPath:             inPath,
-		OutPath:            outPath,
-		DelimiterColor:     mcol.RGBA{R: 0, G: 0, B: 0, A: 255},
-		DelimiterTolerance: 1,
-		MaxColors:          0,
+		InPath:                   inPath,
+		OutPath:                  outPath,
+		DelimiterStrategy:        cli.StrategyBorder,
+		BorderDelimiterColor:     mcol.RGBA{R: 0, G: 0, B: 0, A: 255},
+		BorderDelimiterTolerance: 1,
+		MaxColors:                0,
 	}
 
 	font := renderer.NewBitmapFont()
@@ -122,11 +123,12 @@ func TestPipelineWithMaxColors(t *testing.T) {
 	createTestImage(t, inPath)
 
 	cfg := cli.Config{
-		InPath:             inPath,
-		OutPath:            outPath,
-		DelimiterColor:     mcol.RGBA{R: 0, G: 0, B: 0, A: 255},
-		DelimiterTolerance: 1,
-		MaxColors:          2,
+		InPath:                   inPath,
+		OutPath:                  outPath,
+		DelimiterStrategy:        cli.StrategyBorder,
+		BorderDelimiterColor:     mcol.RGBA{R: 0, G: 0, B: 0, A: 255},
+		BorderDelimiterTolerance: 1,
+		MaxColors:                2,
 	}
 
 	font := renderer.NewBitmapFont()

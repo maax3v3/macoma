@@ -24,7 +24,8 @@ func Run(cfg cli.Config, font renderer.FontRenderer) error {
 
 	// Step 2: Detect delimiter pixels
 	fmt.Println("Detecting delimiter pixels...")
-	dm := detection.Detect(img, cfg.DelimiterColor, cfg.DelimiterTolerance)
+	delim := delimiterFromConfig(cfg)
+	dm := delim.Detect(img)
 	delimCount := countDelimiters(dm)
 	fmt.Printf("Delimiter pixels: %d / %d (%.1f%%)\n",
 		delimCount, dm.Width*dm.Height,
@@ -60,6 +61,19 @@ func Run(cfg cli.Config, font renderer.FontRenderer) error {
 
 	fmt.Println("Done!")
 	return nil
+}
+
+// delimiterFromConfig builds the appropriate Delimiter from CLI config.
+func delimiterFromConfig(cfg cli.Config) detection.Delimiter {
+	if cfg.DelimiterStrategy == cli.StrategyBorder {
+		return &detection.BorderDelimiter{
+			Color:        cfg.BorderDelimiterColor,
+			TolerancePct: cfg.BorderDelimiterTolerance,
+		}
+	}
+	return &detection.ColorDelimiter{
+		TolerancePct: cfg.ColorDelimiterTolerance,
+	}
 }
 
 func countDelimiters(dm *detection.Map) int {
