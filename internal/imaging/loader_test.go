@@ -96,6 +96,42 @@ func TestLoad_JPEG(t *testing.T) {
 	}
 }
 
+func TestExpandPath_Tilde(t *testing.T) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		t.Skip("cannot determine home directory")
+	}
+
+	tests := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{"bare tilde", "~", home},
+		{"tilde with subpath", "~/Downloads/img.png", filepath.Join(home, "Downloads", "img.png")},
+		{"absolute unchanged", "/tmp/img.png", "/tmp/img.png"},
+		{"empty string", "", ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ExpandPath(tt.in)
+			if got != tt.want {
+				t.Errorf("ExpandPath(%q) = %q, want %q", tt.in, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestExpandPath_Relative(t *testing.T) {
+	got := ExpandPath("relative/path.png")
+	if !filepath.IsAbs(got) {
+		t.Errorf("expected absolute path, got %q", got)
+	}
+	if !filepath.IsAbs(got) || filepath.Base(got) != "path.png" {
+		t.Errorf("unexpected result: %q", got)
+	}
+}
+
 func TestLoad_CorruptPNG(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "corrupt.png")

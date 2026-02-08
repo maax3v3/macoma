@@ -15,9 +15,9 @@ func TestBitmapFont_MeasureString(t *testing.T) {
 	bf := NewBitmapFont()
 
 	tests := []struct {
-		name       string
-		text       string
-		size       int
+		name         string
+		text         string
+		size         int
 		wantW, wantH int
 	}{
 		{
