@@ -3,7 +3,7 @@ package aggregation
 import (
 	"testing"
 
-	"github.com/maax3v3/macoma/internal/color"
+	"github.com/maax3v3/macoma/v2/internal/color"
 )
 
 func TestReduceColors_Empty(t *testing.T) {

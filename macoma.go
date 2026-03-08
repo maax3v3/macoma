@@ -19,12 +19,12 @@ import (
 	"image"
 	stdcolor "image/color"
 
-	"github.com/maax3v3/macoma/internal/aggregation"
-	"github.com/maax3v3/macoma/internal/color"
-	"github.com/maax3v3/macoma/internal/detection"
-	"github.com/maax3v3/macoma/internal/imaging"
-	"github.com/maax3v3/macoma/internal/renderer"
-	"github.com/maax3v3/macoma/internal/zone"
+	"github.com/maax3v3/macoma/v2/internal/aggregation"
+	"github.com/maax3v3/macoma/v2/internal/color"
+	"github.com/maax3v3/macoma/v2/internal/detection"
+	"github.com/maax3v3/macoma/v2/internal/imaging"
+	"github.com/maax3v3/macoma/v2/internal/renderer"
+	"github.com/maax3v3/macoma/v2/internal/zone"
 )
 
 // Delimiter strategy constants.

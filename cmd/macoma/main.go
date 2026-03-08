@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/maax3v3/macoma"
-	"github.com/maax3v3/macoma/internal/cli"
+	"github.com/maax3v3/macoma/v2"
+	"github.com/maax3v3/macoma/v2/internal/cli"
 )
 
 func main() {

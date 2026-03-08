@@ -3,7 +3,7 @@ package aggregation
 import (
 	"math"
 
-	"github.com/maax3v3/macoma/internal/color"
+	"github.com/maax3v3/macoma/v2/internal/color"
 )
 
 // ColorEntry represents a resulting color with its assigned number.

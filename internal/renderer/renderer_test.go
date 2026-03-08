@@ -5,10 +5,10 @@ import (
 	"image/color"
 	"testing"
 
-	"github.com/maax3v3/macoma/internal/aggregation"
-	mcol "github.com/maax3v3/macoma/internal/color"
-	"github.com/maax3v3/macoma/internal/detection"
-	"github.com/maax3v3/macoma/internal/zone"
+	"github.com/maax3v3/macoma/v2/internal/aggregation"
+	mcol "github.com/maax3v3/macoma/v2/internal/color"
+	"github.com/maax3v3/macoma/v2/internal/detection"
+	"github.com/maax3v3/macoma/v2/internal/zone"
 )
 
 func TestBitmapFont_MeasureString(t *testing.T) {

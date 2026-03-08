@@ -7,9 +7,9 @@ import (
 	"math"
 	"sync"
 
-	"github.com/maax3v3/macoma/internal/aggregation"
-	"github.com/maax3v3/macoma/internal/detection"
-	"github.com/maax3v3/macoma/internal/zone"
+	"github.com/maax3v3/macoma/v2/internal/aggregation"
+	"github.com/maax3v3/macoma/v2/internal/detection"
+	"github.com/maax3v3/macoma/v2/internal/zone"
 )
 
 // Config holds rendering configuration.

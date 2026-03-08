@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/maax3v3/macoma/internal/color"
+	"github.com/maax3v3/macoma/v2/internal/color"
 )
 
 // Strategy constants for delimiter detection.

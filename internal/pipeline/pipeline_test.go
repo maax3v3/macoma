@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/maax3v3/macoma/internal/cli"
-	mcol "github.com/maax3v3/macoma/internal/color"
-	"github.com/maax3v3/macoma/internal/renderer"
+	"github.com/maax3v3/macoma/v2/internal/cli"
+	mcol "github.com/maax3v3/macoma/v2/internal/color"
+	"github.com/maax3v3/macoma/v2/internal/renderer"
 )
 
 func createTestImage(t *testing.T, path string) {

@@ -7,7 +7,7 @@ A Go library and CLI tool that converts a colored drawing into a **magic colorin
 ### As a library
 
 ```bash
-go get github.com/maax3v3/macoma
+go get github.com/maax3v3/macoma/v2
 ```
 
 ### As a CLI
@@ -21,7 +21,7 @@ go build -o macoma ./cmd/macoma
 ```go
 package main
 
-import "github.com/maax3v3/macoma"
+import "github.com/maax3v3/macoma/v2"
 
 func main() {
 	// Default: color strategy (detects zones by neighbor color difference)

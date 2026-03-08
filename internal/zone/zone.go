@@ -3,8 +3,8 @@ package zone
 import (
 	"image"
 
-	"github.com/maax3v3/macoma/internal/color"
-	"github.com/maax3v3/macoma/internal/detection"
+	"github.com/maax3v3/macoma/v2/internal/color"
+	"github.com/maax3v3/macoma/v2/internal/detection"
 )
 
 // Zone represents a connected region of filler (non-delimiter) pixels.

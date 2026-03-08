@@ -4,7 +4,7 @@ import (
 	"image"
 	"sync"
 
-	"github.com/maax3v3/macoma/internal/color"
+	"github.com/maax3v3/macoma/v2/internal/color"
 )
 
 // Map holds a boolean grid where true means the pixel is a delimiter pixel.

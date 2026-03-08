@@ -5,7 +5,7 @@ import (
 	"image/color"
 	"testing"
 
-	mcol "github.com/maax3v3/macoma/internal/color"
+	mcol "github.com/maax3v3/macoma/v2/internal/color"
 )
 
 // solidImage is a minimal image.Image for testing.

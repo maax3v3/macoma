@@ -5,8 +5,8 @@ import (
 	"image/color"
 	"testing"
 
-	mcol "github.com/maax3v3/macoma/internal/color"
-	"github.com/maax3v3/macoma/internal/detection"
+	mcol "github.com/maax3v3/macoma/v2/internal/color"
+	"github.com/maax3v3/macoma/v2/internal/detection"
 )
 
 func TestCentroid(t *testing.T) {
