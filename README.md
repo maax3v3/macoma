@@ -16,6 +16,13 @@ go get github.com/maax3v3/macoma/v2
 go build -o macoma ./cmd/macoma
 ```
 
+### As a Web App
+
+```bash
+go build -o macoma-web ./cmd/macoma-web
+./macoma-web --addr=:8080
+```
+
 ## Library Usage
 
 ```go
@@ -48,6 +55,16 @@ func main() {
 ```bash
 macoma --in=<input> --out=<output> [options]
 ```
+
+## Web UI Usage
+
+Run `macoma-web`, then open `http://localhost:8080`.
+
+The UI supports:
+- Uploading an input image
+- All conversion knobs (`delimiter_strategy`, delimiter tolerances, border color, `max_colors`)
+- Live preview (downscaled for speed)
+- Full-quality render/export as PNG
 
 ### Options
 

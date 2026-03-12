@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Macoma</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script defer src="/app.js"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" integrity="sha384-X9kJyAubVxnP0hcA+AMMs21U445qsnqhnUF8EBlEpP3a42Kh/JwWjlv2ZcvGfphb" crossorigin="anonymous"></script>
+</head>
+<body>
+  <main class="page" x-data="macomaApp">
+    <section class="panel">
+      <h1>Macoma</h1>
+      <p class="subtitle">Upload an image, tweak settings, preview live, export final PNG.</p>
+
+      <div class="form-section">
+        <label class="field">
+          <span>Input image</span>
+          <input type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" @change="onFileChange($event)">
+        </label>
+      </div>
+
+      <div class="form-section">
+        <div class="grid">
+          <label class="field">
+            <span>Delimiter strategy</span>
+            <select x-model="form.delimiter_strategy" @change="onSettingsChange()">
+              <option value="color">color</option>
+              <option value="border">border</option>
+            </select>
+          </label>
+
+          <label class="field" x-show="form.delimiter_strategy === 'border'" x-cloak>
+            <span>Border delimiter color</span>
+            <input type="text" x-model="form.border_delimiter_color" @input="onSettingsChange()">
+          </label>
+
+          <label class="field" x-show="form.delimiter_strategy === 'border'" x-cloak>
+            <span>Border delimiter tolerance</span>
+            <input type="number" min="0" max="100" step="0.1" x-model="form.border_delimiter_tolerance" @input="onSettingsChange()">
+          </label>
+
+          <label class="field" x-show="form.delimiter_strategy === 'color'" x-cloak>
+            <span>Color delimiter tolerance</span>
+            <input type="number" min="0" max="100" step="0.1" x-model="form.color_delimiter_tolerance" @input="onSettingsChange()">
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <label class="field">
+          <span>Max colors (0 = unlimited)</span>
+          <input type="number" min="0" step="1" x-model="form.max_colors" @input="onSettingsChange()">
+        </label>
+      </div>
+
+      <div class="form-section">
+        <label class="field checkbox">
+          <input type="checkbox" x-model="livePreview" @change="onSettingsChange()">
+          <span>Live preview</span>
+        </label>
+
+        <div class="actions">
+          <button type="button" @click="requestPreview()" :disabled="busy || !file">Refresh preview</button>
+          <button type="button" @click="renderFinal()" :disabled="busy || !file">Render full quality</button>
+        </div>
+      </div>
+
+      <p class="status" x-text="status"></p>
+      <p class="error" x-show="error" x-text="error"></p>
+    </section>
+
+    <section class="panel preview">
+      <h2>Preview</h2>
+      <div class="preview-frame">
+        <img x-show="previewUrl" :src="previewUrl" alt="Preview output">
+        <p x-show="!previewUrl">No preview yet.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

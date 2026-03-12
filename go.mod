@@ -2,4 +2,7 @@ module github.com/maax3v3/macoma/v2
 
 go 1.21
 
-require golang.org/x/image v0.15.0
+require (
+	github.com/go-chi/chi/v5 v5.1.0
+	golang.org/x/image v0.15.0
+)
