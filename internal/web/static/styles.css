@@ -41,9 +41,37 @@ h1, h2 {
   margin: 0 0 10px;
 }
 
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hero h1,
+.hero p {
+  margin: 0;
+}
+
 .subtitle {
   color: var(--muted);
-  margin-top: 0;
+}
+
+.intro {
+  color: var(--muted);
+}
+
+.repo-link-wrap {
+  margin-bottom: 2px;
+}
+
+.repo-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.repo-link:hover {
+  text-decoration: underline;
 }
 
 .form-section {
@@ -75,6 +103,7 @@ input, select, button {
 
 input[type="text"],
 input[type="number"],
+input[type="color"],
 input[type="file"],
 select {
   width: 100%;
@@ -84,10 +113,15 @@ select {
   padding: 8px 10px;
 }
 
+input[type="color"] {
+  height: 40px;
+  padding: 4px;
+}
+
 .checkbox {
   flex-direction: row;
   align-items: center;
-  margin: 10px 0;
+  margin: 0;
 }
 
 .disabled {
