@@ -33,7 +33,7 @@
 
           <label class="field" x-show="form.delimiter_strategy === 'border'" x-cloak>
             <span>Border delimiter color</span>
-            <input type="text" x-model="form.border_delimiter_color" @input="onSettingsChange()">
+            <input type="color" x-model="form.border_delimiter_color" @input="onSettingsChange()">
           </label>
 
           <label class="field" x-show="form.delimiter_strategy === 'border'" x-cloak>

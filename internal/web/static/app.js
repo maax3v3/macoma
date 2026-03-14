@@ -10,7 +10,7 @@ function createMacomaApp() {
     debounceTimer: null,
     form: {
       delimiter_strategy: "color",
-      border_delimiter_color: "#000",
+      border_delimiter_color: "#000000",
       border_delimiter_tolerance: "10",
       color_delimiter_tolerance: "10",
       max_colors: "10"
