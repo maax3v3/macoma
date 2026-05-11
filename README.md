@@ -49,6 +49,7 @@ func main() {
 
 - The `FontRenderer` interface can be implemented to provide custom text rendering (e.g., TTF fonts). Pass it via `Options.Font`.
 - Set `Options.DelimiterStrategy` to `macoma.StrategyColor` (default) or `macoma.StrategyBorder`.
+- Set `Options.LabelReadability` (default `true`) to toggle in-drawing label readability enhancements (white halo + safer placement).
 
 ## CLI Usage
 
@@ -63,6 +64,7 @@ Run `macoma-web`, then open `http://localhost:8080`.
 The UI supports:
 - Uploading an input image
 - All conversion knobs (`delimiter_strategy`, delimiter tolerances, border color, `max_colors`)
+- Label readability toggle (`label_readability`, default `true`)
 - Live preview (downscaled for speed)
 - Full-quality render/export as PNG
 
@@ -77,6 +79,7 @@ The UI supports:
 | `--border-delimiter-tolerance` | Tolerance % for border color matching, 0–100 (border strategy only) | `10` |
 | `--color-delimiter-tolerance` | Color difference threshold %, 0–100 (color strategy only) | `10` |
 | `--max-colors` | Max colors in output (0 = unlimited) | `10` |
+| `--label-readability` | Toggle readability enhancements for in-drawing labels | `true` |
 
 ### Examples
 

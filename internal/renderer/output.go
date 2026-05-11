@@ -18,6 +18,9 @@ type Config struct {
 	LegendCircleSize int // diameter of legend color circles
 	LegendSpacing    int // horizontal spacing between legend items
 	LegendMargin     int // left/right margin for the legend area
+	// LabelReadability enables readability enhancements for in-drawing labels:
+	// white outline + safer placement away from delimiters.
+	LabelReadability bool
 }
 
 // DefaultConfig returns sensible default rendering configuration.
@@ -27,6 +30,7 @@ func DefaultConfig() Config {
 		LegendCircleSize: 30,
 		LegendSpacing:    15,
 		LegendMargin:     20,
+		LabelReadability: true,
 	}
 }
 
@@ -90,6 +94,11 @@ func Render(
 			pos := z.InteriorPoint()
 
 			numStr := fmt.Sprintf("%d", entry.Number)
+			if cfg.LabelReadability {
+				pos = findSaferLabelPosition(z, dm, pos, fontSize)
+				drawOutlinedString(font, out, numStr, pos.X, pos.Y, color.Black, color.White, fontSize)
+				return
+			}
 			font.DrawString(out, numStr, pos.X, pos.Y, color.Black, fontSize)
 		}(i)
 	}
@@ -211,4 +220,99 @@ func drawCircleBorder(img *image.RGBA, cx, cy, radius int, col color.RGBA) {
 			img.SetRGBA(px, py, col)
 		}
 	}
+}
+
+func drawOutlinedString(
+	font FontRenderer,
+	img *image.RGBA,
+	text string,
+	cx, cy int,
+	textColor, outlineColor color.Color,
+	size int,
+) {
+	outlineRadius := 1
+	if size >= 14 {
+		outlineRadius = 2
+	}
+
+	for dy := -outlineRadius; dy <= outlineRadius; dy++ {
+		for dx := -outlineRadius; dx <= outlineRadius; dx++ {
+			if dx == 0 && dy == 0 {
+				continue
+			}
+			font.DrawString(img, text, cx+dx, cy+dy, outlineColor, size)
+		}
+	}
+	font.DrawString(img, text, cx, cy, textColor, size)
+}
+
+func findSaferLabelPosition(z *zone.Zone, dm *detection.Map, base image.Point, fontSize int) image.Point {
+	searchRadius := fontSize * 2
+	if searchRadius < 6 {
+		searchRadius = 6
+	}
+	if searchRadius > 14 {
+		searchRadius = 14
+	}
+	searchRadiusSq := searchRadius * searchRadius
+
+	clearanceProbeRadius := fontSize
+	if clearanceProbeRadius < 4 {
+		clearanceProbeRadius = 4
+	}
+	if clearanceProbeRadius > 10 {
+		clearanceProbeRadius = 10
+	}
+
+	best := base
+	bestClearance := delimiterClearanceSq(dm, base, clearanceProbeRadius)
+	bestBaseDist := 0
+
+	for _, p := range z.Pixels {
+		dx := p.X - base.X
+		dy := p.Y - base.Y
+		baseDist := dx*dx + dy*dy
+		if baseDist > searchRadiusSq {
+			continue
+		}
+
+		clearance := delimiterClearanceSq(dm, p, clearanceProbeRadius)
+		if clearance > bestClearance || (clearance == bestClearance && baseDist < bestBaseDist) {
+			best = p
+			bestClearance = clearance
+			bestBaseDist = baseDist
+		}
+	}
+
+	return best
+}
+
+func delimiterClearanceSq(dm *detection.Map, p image.Point, probeRadius int) int {
+	best := (probeRadius + 1) * (probeRadius + 1)
+	rSq := probeRadius * probeRadius
+
+	for dy := -probeRadius; dy <= probeRadius; dy++ {
+		y := p.Y + dy
+		if y < 0 || y >= dm.Height {
+			continue
+		}
+		for dx := -probeRadius; dx <= probeRadius; dx++ {
+			dSq := dx*dx + dy*dy
+			if dSq > rSq {
+				continue
+			}
+			x := p.X + dx
+			if x < 0 || x >= dm.Width {
+				continue
+			}
+			if !dm.At(x, y) {
+				continue
+			}
+			if dSq < best {
+				best = dSq
+			}
+		}
+	}
+
+	return best
 }

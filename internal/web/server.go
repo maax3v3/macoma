@@ -213,6 +213,14 @@ func optionsFromForm(values map[string][]string) (macoma.Options, error) {
 		opts.MaxColors = v
 	}
 
+	if raw := get("label_readability"); raw != "" {
+		v, err := strconv.ParseBool(raw)
+		if err != nil {
+			return opts, fmt.Errorf("label_readability must be a boolean")
+		}
+		opts.LabelReadability = v
+	}
+
 	return opts, nil
 }
 

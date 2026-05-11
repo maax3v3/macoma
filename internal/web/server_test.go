@@ -100,6 +100,13 @@ func TestValidationErrors(t *testing.T) {
 			wantStatus: http.StatusBadRequest,
 		},
 		{
+			name: "invalid label_readability",
+			req: multipartRequest(t, "/api/preview", createSamplePNG(t, 64, 64), map[string]string{
+				"label_readability": "maybe",
+			}),
+			wantStatus: http.StatusBadRequest,
+		},
+		{
 			name: "unsupported image",
 			req: multipartRequestWithContent(t, "/api/preview", "image", "bad.txt", []byte("not an image"), map[string]string{}),
 			wantStatus: http.StatusBadRequest,
@@ -121,6 +128,26 @@ func TestValidationErrors(t *testing.T) {
 				t.Fatalf("expected error message")
 			}
 		})
+	}
+}
+
+func TestOptionsFromForm_LabelReadability(t *testing.T) {
+	opts, err := optionsFromForm(map[string][]string{})
+	if err != nil {
+		t.Fatalf("optionsFromForm() error = %v", err)
+	}
+	if !opts.LabelReadability {
+		t.Fatal("LabelReadability should default to true")
+	}
+
+	opts, err = optionsFromForm(map[string][]string{
+		"label_readability": {"false"},
+	})
+	if err != nil {
+		t.Fatalf("optionsFromForm() with false error = %v", err)
+	}
+	if opts.LabelReadability {
+		t.Fatal("LabelReadability should parse false value")
 	}
 }
 

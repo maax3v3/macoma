@@ -124,6 +124,10 @@ input[type="color"] {
   margin: 0;
 }
 
+.field + .field.checkbox {
+  margin-top: 8px;
+}
+
 .disabled {
   opacity: 0.6;
 }

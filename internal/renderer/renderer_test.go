@@ -3,6 +3,7 @@ package renderer
 import (
 	"image"
 	"image/color"
+	"sync"
 	"testing"
 
 	"github.com/maax3v3/macoma/v2/internal/aggregation"
@@ -110,6 +111,104 @@ func TestBitmapFont_DrawString_UnknownGlyph(t *testing.T) {
 
 func TestBitmapFont_ImplementsFontRenderer(t *testing.T) {
 	var _ FontRenderer = (*BitmapFont)(nil)
+}
+
+func TestDrawOutlinedString_WritesOutlineAndMainText(t *testing.T) {
+	font := NewBitmapFont()
+	img := image.NewRGBA(image.Rect(0, 0, 40, 40))
+	bg := color.RGBA{200, 0, 0, 255}
+	for y := 0; y < 40; y++ {
+		for x := 0; x < 40; x++ {
+			img.SetRGBA(x, y, bg)
+		}
+	}
+
+	drawOutlinedString(font, img, "8", 20, 20, color.Black, color.White, 14)
+
+	var whiteCount, blackCount int
+	for y := 0; y < 40; y++ {
+		for x := 0; x < 40; x++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			switch {
+			case r == 0xFFFF && g == 0xFFFF && b == 0xFFFF:
+				whiteCount++
+			case r == 0 && g == 0 && b == 0:
+				blackCount++
+			}
+		}
+	}
+
+	if whiteCount == 0 {
+		t.Fatal("expected white outline pixels, found none")
+	}
+	if blackCount == 0 {
+		t.Fatal("expected black text pixels, found none")
+	}
+}
+
+func TestFindSaferLabelPosition_MovesAwayFromDelimiter(t *testing.T) {
+	w, h := 20, 20
+	dm := &detection.Map{
+		Width:       w,
+		Height:      h,
+		IsDelimiter: make([]bool, w*h),
+	}
+	for y := 0; y < h; y++ {
+		dm.IsDelimiter[y*w+9] = true
+	}
+
+	z := &zone.Zone{}
+	for y := 0; y < h; y++ {
+		for x := 0; x <= 8; x++ {
+			z.Pixels = append(z.Pixels, image.Point{X: x, Y: y})
+		}
+	}
+	base := image.Point{X: 8, Y: 10}
+
+	got := findSaferLabelPosition(z, dm, base, 14)
+	if got.X >= base.X {
+		t.Fatalf("expected label to move left from border, base=%v got=%v", base, got)
+	}
+
+	baseClearance := delimiterClearanceSq(dm, base, 10)
+	gotClearance := delimiterClearanceSq(dm, got, 10)
+	if gotClearance <= baseClearance {
+		t.Fatalf("expected better delimiter clearance, base=%d got=%d", baseClearance, gotClearance)
+	}
+}
+
+func TestRender_LabelReadabilityToggle(t *testing.T) {
+	srcW, srcH := 20, 20
+	src := image.NewRGBA(image.Rect(0, 0, srcW, srcH))
+	for y := 0; y < srcH; y++ {
+		for x := 0; x < srcW; x++ {
+			src.SetRGBA(x, y, color.RGBA{255, 0, 0, 255})
+		}
+	}
+
+	dm := &detection.Map{Width: srcW, Height: srcH, IsDelimiter: make([]bool, srcW*srcH)}
+	zones, labels := zone.FindZones(dm)
+	zc := zone.ComputeZoneColors(zones, src)
+	cm := aggregation.ReduceColors(zc.Colors, 0)
+
+	enabledCfg := DefaultConfig()
+	enabledCfg.LabelReadability = true
+	enabledFont := &recordingFont{}
+	_ = Render(src, dm, zones, labels, cm, enabledFont, enabledCfg)
+
+	disabledCfg := DefaultConfig()
+	disabledCfg.LabelReadability = false
+	disabledFont := &recordingFont{}
+	_ = Render(src, dm, zones, labels, cm, disabledFont, disabledCfg)
+
+	enabledDrawingCalls := enabledFont.countDrawingCalls(srcH)
+	disabledDrawingCalls := disabledFont.countDrawingCalls(srcH)
+	if enabledDrawingCalls <= disabledDrawingCalls {
+		t.Fatalf("expected more drawing label calls when readability is enabled, enabled=%d disabled=%d", enabledDrawingCalls, disabledDrawingCalls)
+	}
+	if disabledDrawingCalls != len(zones) {
+		t.Fatalf("expected one drawing label call per zone when disabled, got=%d zones=%d", disabledDrawingCalls, len(zones))
+	}
 }
 
 func TestDefaultConfig(t *testing.T) {
@@ -288,4 +387,35 @@ func TestCalculateLegendHeight_WithEntries(t *testing.T) {
 	if h <= 0 {
 		t.Errorf("expected positive legend height, got %d", h)
 	}
+}
+
+type drawCall struct {
+	x, y int
+}
+
+type recordingFont struct {
+	mu    sync.Mutex
+	calls []drawCall
+}
+
+func (f *recordingFont) DrawString(_ *image.RGBA, _ string, cx, cy int, _ color.Color, _ int) {
+	f.mu.Lock()
+	f.calls = append(f.calls, drawCall{x: cx, y: cy})
+	f.mu.Unlock()
+}
+
+func (f *recordingFont) MeasureString(_ string, _ int) (width, height int) {
+	return 5, 7
+}
+
+func (f *recordingFont) countDrawingCalls(srcH int) int {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	count := 0
+	for _, c := range f.calls {
+		if c.y < srcH {
+			count++
+		}
+	}
+	return count
 }

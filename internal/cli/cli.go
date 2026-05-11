@@ -25,6 +25,7 @@ type Config struct {
 	BorderDelimiterTolerance float64
 	ColorDelimiterTolerance  float64
 	MaxColors                int
+	LabelReadability         bool
 }
 
 // Parse parses CLI arguments and returns a validated Config.
@@ -36,6 +37,7 @@ func Parse() (Config, error) {
 	borderTolerance := flag.Float64("border-delimiter-tolerance", 10, "Tolerance % for matching the border color, 0-100 (border strategy only)")
 	colorTolerance := flag.Float64("color-delimiter-tolerance", 10, "Color difference threshold % from which neighbors are considered different sections, 0-100 (color strategy only)")
 	maxColors := flag.Int("max-colors", 10, "Maximum number of colors in the magic drawing (0 = unlimited)")
+	labelReadability := flag.Bool("label-readability", true, "Enable readability enhancements for zone labels (white outline + safer placement)")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: macoma [options]\n\nOptions:\n")
@@ -80,5 +82,6 @@ func Parse() (Config, error) {
 		BorderDelimiterTolerance: *borderTolerance,
 		ColorDelimiterTolerance:  *colorTolerance,
 		MaxColors:                *maxColors,
+		LabelReadability:         *labelReadability,
 	}, nil
 }

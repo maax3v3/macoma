@@ -13,7 +13,8 @@ function createMacomaApp() {
       border_delimiter_color: "#000000",
       border_delimiter_tolerance: "10",
       color_delimiter_tolerance: "10",
-      max_colors: "10"
+      max_colors: "10",
+      label_readability: true
     },
 
     onFileChange(event) {
@@ -44,6 +45,7 @@ function createMacomaApp() {
       fd.append("border_delimiter_tolerance", String(this.form.border_delimiter_tolerance));
       fd.append("color_delimiter_tolerance", String(this.form.color_delimiter_tolerance));
       fd.append("max_colors", String(this.form.max_colors));
+      fd.append("label_readability", String(this.form.label_readability));
       return fd;
     },
 

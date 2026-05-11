@@ -26,6 +26,7 @@ func main() {
 		BorderDelimiterTolerance: cfg.BorderDelimiterTolerance,
 		ColorDelimiterTolerance:  cfg.ColorDelimiterTolerance,
 		MaxColors:                cfg.MaxColors,
+		LabelReadability:         cfg.LabelReadability,
 	}
 
 	fmt.Printf("Loading image: %s\n", cfg.InPath)

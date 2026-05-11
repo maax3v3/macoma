@@ -49,6 +49,7 @@ func Run(cfg cli.Config, font renderer.FontRenderer) error {
 	// Step 6: Render output image
 	fmt.Println("Rendering output...")
 	rcfg := renderer.DefaultConfig()
+	rcfg.LabelReadability = cfg.LabelReadability
 	// Scale legend elements based on image size
 	scaleLegendConfig(&rcfg, img.Bounds())
 	output := renderer.Render(img, dm, zones, labels, cm, font, rcfg)

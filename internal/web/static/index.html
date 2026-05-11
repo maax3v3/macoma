@@ -60,6 +60,10 @@
           <span>Max colors (0 = unlimited)</span>
           <input type="number" min="0" step="1" x-model="form.max_colors" @input="onSettingsChange()">
         </label>
+        <label class="field checkbox">
+          <input type="checkbox" x-model="form.label_readability" @change="onSettingsChange()">
+          <span>Label readability (halo + safer placement)</span>
+        </label>
       </div>
 
       <div class="form-section">

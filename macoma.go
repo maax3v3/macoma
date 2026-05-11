@@ -61,6 +61,11 @@ type Options struct {
 	// Default: 10.
 	MaxColors int
 
+	// LabelReadability enables readability enhancements for in-drawing labels:
+	// white outline and safer positioning away from delimiters.
+	// Default: true.
+	LabelReadability bool
+
 	// Font is the font renderer used to draw numbers on the output image.
 	// If nil, a built-in bitmap font is used.
 	Font FontRenderer
@@ -91,6 +96,7 @@ func DefaultOptions() Options {
 		BorderDelimiterTolerance: 10,
 		ColorDelimiterTolerance:  10,
 		MaxColors:                10,
+		LabelReadability:         true,
 	}
 }
 
@@ -141,6 +147,7 @@ func Convert(img image.Image, opts Options) (*image.RGBA, error) {
 
 	// Render output image
 	rcfg := renderer.DefaultConfig()
+	rcfg.LabelReadability = opts.LabelReadability
 	scaleLegendConfig(&rcfg, img.Bounds())
 	output := renderer.Render(img, dm, zones, labels, cm, font, rcfg)
 
