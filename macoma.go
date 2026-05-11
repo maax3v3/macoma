@@ -29,8 +29,9 @@ import (
 
 // Delimiter strategy constants.
 const (
-	StrategyBorder = "border" // Detect borders by matching a specific color.
-	StrategyColor  = "color"  // Detect borders by color differences between neighbors.
+	StrategyBorder   = "border"   // Detect borders by matching a specific color.
+	StrategyColor    = "color"    // Detect borders by color differences between neighbors.
+	StrategyGradient = "gradient" // Detect borders from gradient edges + contour closure.
 )
 
 // Options configures the magic coloring conversion.
@@ -55,6 +56,27 @@ type Options struct {
 	// sections. Only used when DelimiterStrategy is "color".
 	// Default: 10.
 	ColorDelimiterTolerance float64
+
+	// GradientBlurSigma controls pre-edge Gaussian blur strength.
+	// Only used when DelimiterStrategy is "gradient".
+	// Default: 1.2.
+	GradientBlurSigma float64
+
+	// GradientLowThreshold is the weak threshold (0..1) for hysteresis edge linking.
+	// Only used when DelimiterStrategy is "gradient". Default: 0.08.
+	GradientLowThreshold float64
+
+	// GradientHighThreshold is the strong threshold (0..1) for hysteresis edge linking.
+	// Only used when DelimiterStrategy is "gradient". Default: 0.20.
+	GradientHighThreshold float64
+
+	// GradientCloseRadius controls morphology closing radius in pixels.
+	// Only used when DelimiterStrategy is "gradient". Default: 1.
+	GradientCloseRadius int
+
+	// GradientMinComponentSize removes tiny edge components below this size.
+	// Only used when DelimiterStrategy is "gradient". Default: 24.
+	GradientMinComponentSize int
 
 	// MaxColors is the maximum number of distinct colors in the output.
 	// 0 means unlimited.
@@ -95,6 +117,11 @@ func DefaultOptions() Options {
 		BorderDelimiterColor:     Color{0, 0, 0, 255},
 		BorderDelimiterTolerance: 10,
 		ColorDelimiterTolerance:  10,
+		GradientBlurSigma:        1.2,
+		GradientLowThreshold:     0.08,
+		GradientHighThreshold:    0.20,
+		GradientCloseRadius:      1,
+		GradientMinComponentSize: 24,
 		MaxColors:                10,
 		LabelReadability:         true,
 	}
@@ -207,6 +234,15 @@ func delimiterFromOpts(opts Options) detection.Delimiter {
 				A: opts.BorderDelimiterColor.A,
 			},
 			TolerancePct: opts.BorderDelimiterTolerance,
+		}
+	}
+	if opts.DelimiterStrategy == StrategyGradient {
+		return &detection.GradientDelimiter{
+			BlurSigma:        opts.GradientBlurSigma,
+			LowThreshold:     opts.GradientLowThreshold,
+			HighThreshold:    opts.GradientHighThreshold,
+			CloseRadius:      opts.GradientCloseRadius,
+			MinComponentSize: opts.GradientMinComponentSize,
 		}
 	}
 	return &detection.ColorDelimiter{

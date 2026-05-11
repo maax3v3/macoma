@@ -59,7 +59,7 @@ Path normalization expands `~` to the user home directory and resolves relative 
 
 **Package:** `internal/detection`
 
-A **delimiter pixel** is a pixel that belongs to a zone boundary (the black lines in the final output). Two strategies are available, selected via the `--delimiter-strategy` flag.
+A **delimiter pixel** is a pixel that belongs to a zone boundary (the black lines in the final output). Three strategies are available, selected via the `--delimiter-strategy` flag.
 
 ### Strategy: `border`
 
@@ -130,6 +130,22 @@ Euclidean distance distributes sensitivity equally across all channels. When two
 A per-pixel neighbor comparison (comparing each pixel to its immediate neighbors) misses anti-aliased edges where each individual pixel-to-pixel step is below threshold but the cumulative change across the transition zone is significant. The 5×5 range filter window spans the entire transition, catching both sides of the boundary in a single measurement. This produces naturally thick (~5 px), continuous, gap-free borders with no need for morphological post-processing.
 
 **Complexity:** O(W × H × 25) — 25 lookups per pixel for the 5×5 window.
+
+### Strategy: `gradient`
+
+**Implementation:** `GradientDelimiter`
+
+Designed for complex artwork with gradients, anti-aliased contours, and 3D shading where pure local color thresholding can produce gaps or noise.
+
+**Algorithm:**
+
+1. Convert to luminance and apply Gaussian blur (`gradient-blur-sigma`).
+2. Compute Sobel gradient magnitude.
+3. Apply hysteresis thresholds (`gradient-low-threshold`, `gradient-high-threshold`) to keep strong edges and linked weak edges.
+4. Apply morphological closing (`gradient-close-radius`) to bridge small contour gaps.
+5. Remove tiny connected edge components (`gradient-min-component-size`).
+
+**Complexity:** approximately O(W × H × K) where `K` is the blur kernel width plus local morphology neighborhood.
 
 ### Parallelization
 

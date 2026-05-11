@@ -35,6 +35,7 @@
             <select x-model="form.delimiter_strategy" @change="onSettingsChange()">
               <option value="color">color</option>
               <option value="border">border</option>
+              <option value="gradient">gradient</option>
             </select>
           </label>
 
@@ -51,6 +52,31 @@
           <label class="field" x-show="form.delimiter_strategy === 'color'" x-cloak>
             <span>Color delimiter tolerance</span>
             <input type="number" min="0" max="100" step="0.1" x-model="form.color_delimiter_tolerance" @input="onSettingsChange()">
+          </label>
+
+          <label class="field" x-show="form.delimiter_strategy === 'gradient'" x-cloak>
+            <span>Gradient blur sigma</span>
+            <input type="number" min="0.1" step="0.1" x-model="form.gradient_blur_sigma" @input="onSettingsChange()">
+          </label>
+
+          <label class="field" x-show="form.delimiter_strategy === 'gradient'" x-cloak>
+            <span>Gradient low threshold (0-1)</span>
+            <input type="number" min="0" max="1" step="0.01" x-model="form.gradient_low_threshold" @input="onSettingsChange()">
+          </label>
+
+          <label class="field" x-show="form.delimiter_strategy === 'gradient'" x-cloak>
+            <span>Gradient high threshold (0-1)</span>
+            <input type="number" min="0" max="1" step="0.01" x-model="form.gradient_high_threshold" @input="onSettingsChange()">
+          </label>
+
+          <label class="field" x-show="form.delimiter_strategy === 'gradient'" x-cloak>
+            <span>Gradient close radius</span>
+            <input type="number" min="0" step="1" x-model="form.gradient_close_radius" @input="onSettingsChange()">
+          </label>
+
+          <label class="field" x-show="form.delimiter_strategy === 'gradient'" x-cloak>
+            <span>Gradient min component size</span>
+            <input type="number" min="0" step="1" x-model="form.gradient_min_component_size" @input="onSettingsChange()">
           </label>
         </div>
       </div>

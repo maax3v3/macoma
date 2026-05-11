@@ -116,6 +116,10 @@ func TestColorDelimiter_ImplementsInterface(t *testing.T) {
 	var _ Delimiter = (*ColorDelimiter)(nil)
 }
 
+func TestGradientDelimiter_ImplementsInterface(t *testing.T) {
+	var _ Delimiter = (*GradientDelimiter)(nil)
+}
+
 func TestColorDelimiter_UniformImage(t *testing.T) {
 	// A uniform-color image should have no delimiters at any tolerance > 0
 	img := newSolidImage(10, 10, color.RGBA{100, 100, 100, 255})
@@ -224,5 +228,52 @@ func TestMap_At(t *testing.T) {
 		if got := dm.At(tt.x, tt.y); got != tt.want {
 			t.Errorf("At(%d,%d) = %v, want %v", tt.x, tt.y, got, tt.want)
 		}
+	}
+}
+
+func TestGradientDelimiter_UniformImage(t *testing.T) {
+	img := newSolidImage(20, 20, color.RGBA{100, 100, 100, 255})
+	gd := &GradientDelimiter{
+		BlurSigma:        1.2,
+		LowThreshold:     0.08,
+		HighThreshold:    0.20,
+		CloseRadius:      1,
+		MinComponentSize: 5,
+	}
+	dm := gd.Detect(img)
+	for y := 0; y < 20; y++ {
+		for x := 0; x < 20; x++ {
+			if dm.At(x, y) {
+				t.Fatalf("pixel (%d,%d) should not be delimiter in uniform image", x, y)
+			}
+		}
+	}
+}
+
+func TestGradientDelimiter_TwoHalves(t *testing.T) {
+	w, h := 60, 20
+	img := newSolidImage(w, h, color.RGBA{255, 0, 0, 255})
+	for y := 0; y < h; y++ {
+		for x := w / 2; x < w; x++ {
+			img.data[y*w+x] = color.RGBA{0, 0, 255, 255}
+		}
+	}
+	gd := &GradientDelimiter{
+		BlurSigma:        1.0,
+		LowThreshold:     0.05,
+		HighThreshold:    0.15,
+		CloseRadius:      1,
+		MinComponentSize: 0,
+	}
+	dm := gd.Detect(img)
+	found := false
+	for y := 2; y < h-2; y++ {
+		if dm.At(w/2-1, y) || dm.At(w/2, y) {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatal("expected delimiter near boundary between two color halves")
 	}
 }

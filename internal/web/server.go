@@ -27,16 +27,16 @@ const (
 
 // Config configures the web server behavior.
 type Config struct {
-	MaxBodyBytes       int64
-	RequestTimeout     time.Duration
+	MaxBodyBytes        int64
+	RequestTimeout      time.Duration
 	PreviewMaxDimension int
 }
 
 // DefaultConfig returns sensible defaults for web operation.
 func DefaultConfig() Config {
 	return Config{
-		MaxBodyBytes:       defaultMaxBodyBytes,
-		RequestTimeout:     30 * time.Second,
+		MaxBodyBytes:        defaultMaxBodyBytes,
+		RequestTimeout:      30 * time.Second,
 		PreviewMaxDimension: PreviewMaxDimension,
 	}
 }
@@ -166,8 +166,8 @@ func optionsFromForm(values map[string][]string) (macoma.Options, error) {
 	}
 
 	if strategy := get("delimiter_strategy"); strategy != "" {
-		if strategy != macoma.StrategyColor && strategy != macoma.StrategyBorder {
-			return opts, fmt.Errorf("delimiter_strategy must be %q or %q", macoma.StrategyColor, macoma.StrategyBorder)
+		if strategy != macoma.StrategyColor && strategy != macoma.StrategyBorder && strategy != macoma.StrategyGradient {
+			return opts, fmt.Errorf("delimiter_strategy must be %q, %q or %q", macoma.StrategyColor, macoma.StrategyBorder, macoma.StrategyGradient)
 		}
 		opts.DelimiterStrategy = strategy
 	}
@@ -211,6 +211,65 @@ func optionsFromForm(values map[string][]string) (macoma.Options, error) {
 			return opts, fmt.Errorf("max_colors must be >= 0")
 		}
 		opts.MaxColors = v
+	}
+
+	if raw := get("gradient_blur_sigma"); raw != "" {
+		v, err := strconv.ParseFloat(raw, 64)
+		if err != nil {
+			return opts, fmt.Errorf("gradient_blur_sigma must be a number")
+		}
+		if v <= 0 {
+			return opts, fmt.Errorf("gradient_blur_sigma must be > 0")
+		}
+		opts.GradientBlurSigma = v
+	}
+
+	if raw := get("gradient_low_threshold"); raw != "" {
+		v, err := strconv.ParseFloat(raw, 64)
+		if err != nil {
+			return opts, fmt.Errorf("gradient_low_threshold must be a number")
+		}
+		if v < 0 || v > 1 {
+			return opts, fmt.Errorf("gradient_low_threshold must be between 0 and 1")
+		}
+		opts.GradientLowThreshold = v
+	}
+
+	if raw := get("gradient_high_threshold"); raw != "" {
+		v, err := strconv.ParseFloat(raw, 64)
+		if err != nil {
+			return opts, fmt.Errorf("gradient_high_threshold must be a number")
+		}
+		if v < 0 || v > 1 {
+			return opts, fmt.Errorf("gradient_high_threshold must be between 0 and 1")
+		}
+		opts.GradientHighThreshold = v
+	}
+
+	if opts.GradientLowThreshold > opts.GradientHighThreshold {
+		return opts, fmt.Errorf("gradient_low_threshold must be <= gradient_high_threshold")
+	}
+
+	if raw := get("gradient_close_radius"); raw != "" {
+		v, err := strconv.Atoi(raw)
+		if err != nil {
+			return opts, fmt.Errorf("gradient_close_radius must be an integer")
+		}
+		if v < 0 {
+			return opts, fmt.Errorf("gradient_close_radius must be >= 0")
+		}
+		opts.GradientCloseRadius = v
+	}
+
+	if raw := get("gradient_min_component_size"); raw != "" {
+		v, err := strconv.Atoi(raw)
+		if err != nil {
+			return opts, fmt.Errorf("gradient_min_component_size must be an integer")
+		}
+		if v < 0 {
+			return opts, fmt.Errorf("gradient_min_component_size must be >= 0")
+		}
+		opts.GradientMinComponentSize = v
 	}
 
 	if raw := get("label_readability"); raw != "" {

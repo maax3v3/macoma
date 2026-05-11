@@ -24,10 +24,10 @@ func TestPreviewAndRenderSuccess(t *testing.T) {
 	src := createSamplePNG(t, 300, 200)
 
 	previewReq := multipartRequest(t, "/api/preview", src, map[string]string{
-		"delimiter_strategy": "border",
-		"border_delimiter_color": "#000",
+		"delimiter_strategy":         "border",
+		"border_delimiter_color":     "#000",
 		"border_delimiter_tolerance": "10",
-		"max_colors": "8",
+		"max_colors":                 "8",
 	})
 	previewRec := httptest.NewRecorder()
 	h.ServeHTTP(previewRec, previewReq)
@@ -43,10 +43,10 @@ func TestPreviewAndRenderSuccess(t *testing.T) {
 	}
 
 	renderReq := multipartRequest(t, "/api/render", src, map[string]string{
-		"delimiter_strategy": "border",
-		"border_delimiter_color": "#000",
+		"delimiter_strategy":         "border",
+		"border_delimiter_color":     "#000",
 		"border_delimiter_tolerance": "10",
-		"max_colors": "8",
+		"max_colors":                 "8",
 	})
 	renderRec := httptest.NewRecorder()
 	h.ServeHTTP(renderRec, renderReq)
@@ -93,6 +93,15 @@ func TestValidationErrors(t *testing.T) {
 			wantStatus: http.StatusBadRequest,
 		},
 		{
+			name: "invalid gradient threshold order",
+			req: multipartRequest(t, "/api/preview", createSamplePNG(t, 64, 64), map[string]string{
+				"delimiter_strategy":      "gradient",
+				"gradient_low_threshold":  "0.9",
+				"gradient_high_threshold": "0.2",
+			}),
+			wantStatus: http.StatusBadRequest,
+		},
+		{
 			name: "negative max colors",
 			req: multipartRequest(t, "/api/preview", createSamplePNG(t, 64, 64), map[string]string{
 				"max_colors": "-1",
@@ -107,8 +116,8 @@ func TestValidationErrors(t *testing.T) {
 			wantStatus: http.StatusBadRequest,
 		},
 		{
-			name: "unsupported image",
-			req: multipartRequestWithContent(t, "/api/preview", "image", "bad.txt", []byte("not an image"), map[string]string{}),
+			name:       "unsupported image",
+			req:        multipartRequestWithContent(t, "/api/preview", "image", "bad.txt", []byte("not an image"), map[string]string{}),
 			wantStatus: http.StatusBadRequest,
 		},
 	}
@@ -148,6 +157,29 @@ func TestOptionsFromForm_LabelReadability(t *testing.T) {
 	}
 	if opts.LabelReadability {
 		t.Fatal("LabelReadability should parse false value")
+	}
+}
+
+func TestOptionsFromForm_GradientFields(t *testing.T) {
+	opts, err := optionsFromForm(map[string][]string{
+		"delimiter_strategy":          {"gradient"},
+		"gradient_blur_sigma":         {"1.5"},
+		"gradient_low_threshold":      {"0.06"},
+		"gradient_high_threshold":     {"0.18"},
+		"gradient_close_radius":       {"2"},
+		"gradient_min_component_size": {"30"},
+	})
+	if err != nil {
+		t.Fatalf("optionsFromForm() error = %v", err)
+	}
+	if opts.DelimiterStrategy != "gradient" {
+		t.Fatalf("DelimiterStrategy = %q, want gradient", opts.DelimiterStrategy)
+	}
+	if opts.GradientBlurSigma != 1.5 || opts.GradientLowThreshold != 0.06 || opts.GradientHighThreshold != 0.18 {
+		t.Fatalf("unexpected gradient threshold values: %+v", opts)
+	}
+	if opts.GradientCloseRadius != 2 || opts.GradientMinComponentSize != 30 {
+		t.Fatalf("unexpected gradient morphology values: %+v", opts)
 	}
 }
 

@@ -13,6 +13,11 @@ function createMacomaApp() {
       border_delimiter_color: "#000000",
       border_delimiter_tolerance: "10",
       color_delimiter_tolerance: "10",
+      gradient_blur_sigma: "1.2",
+      gradient_low_threshold: "0.08",
+      gradient_high_threshold: "0.20",
+      gradient_close_radius: "1",
+      gradient_min_component_size: "24",
       max_colors: "10",
       label_readability: true
     },
@@ -44,6 +49,11 @@ function createMacomaApp() {
       fd.append("border_delimiter_color", this.form.border_delimiter_color);
       fd.append("border_delimiter_tolerance", String(this.form.border_delimiter_tolerance));
       fd.append("color_delimiter_tolerance", String(this.form.color_delimiter_tolerance));
+      fd.append("gradient_blur_sigma", String(this.form.gradient_blur_sigma));
+      fd.append("gradient_low_threshold", String(this.form.gradient_low_threshold));
+      fd.append("gradient_high_threshold", String(this.form.gradient_high_threshold));
+      fd.append("gradient_close_radius", String(this.form.gradient_close_radius));
+      fd.append("gradient_min_component_size", String(this.form.gradient_min_component_size));
       fd.append("max_colors", String(this.form.max_colors));
       fd.append("label_readability", String(this.form.label_readability));
       return fd;

@@ -48,7 +48,7 @@ func main() {
 ```
 
 - The `FontRenderer` interface can be implemented to provide custom text rendering (e.g., TTF fonts). Pass it via `Options.Font`.
-- Set `Options.DelimiterStrategy` to `macoma.StrategyColor` (default) or `macoma.StrategyBorder`.
+- Set `Options.DelimiterStrategy` to `macoma.StrategyColor` (default), `macoma.StrategyBorder`, or `macoma.StrategyGradient`.
 - Set `Options.LabelReadability` (default `true`) to toggle in-drawing label readability enhancements (white halo + safer placement).
 
 ## CLI Usage
@@ -74,10 +74,15 @@ The UI supports:
 |------|-------------|---------|
 | `--in` | Path to input image (PNG, JPEG, WEBP) | *required* |
 | `--out` | Path to output image (must be `.png`) | *required* |
-| `--delimiter-strategy` | `color` (neighbor difference) or `border` (explicit border color) | `color` |
+| `--delimiter-strategy` | `color` (neighbor difference), `border` (explicit border color), or `gradient` (edge pipeline) | `color` |
 | `--border-delimiter-color` | Hex color of delimiter lines (border strategy only) | `#000` |
 | `--border-delimiter-tolerance` | Tolerance % for border color matching, 0–100 (border strategy only) | `10` |
 | `--color-delimiter-tolerance` | Color difference threshold %, 0–100 (color strategy only) | `10` |
+| `--gradient-blur-sigma` | Gaussian blur sigma for gradient strategy (`> 0`) | `1.2` |
+| `--gradient-low-threshold` | Weak threshold for gradient hysteresis, `0–1` | `0.08` |
+| `--gradient-high-threshold` | Strong threshold for gradient hysteresis, `0–1` | `0.20` |
+| `--gradient-close-radius` | Morphological close radius for gradient strategy (`>= 0`) | `1` |
+| `--gradient-min-component-size` | Remove tiny edge components under this size (`>= 0`) | `24` |
 | `--max-colors` | Max colors in output (0 = unlimited) | `10` |
 | `--label-readability` | Toggle readability enhancements for in-drawing labels | `true` |
 
@@ -89,6 +94,9 @@ macoma --in=drawing.png --out=coloring.png --color-delimiter-tolerance=10 --max-
 
 # Border strategy: zones detected by matching explicit border color
 macoma --in=drawing.png --out=coloring.png --delimiter-strategy=border --border-delimiter-color=#000 --border-delimiter-tolerance=10
+
+# Gradient strategy: robust for shading/gradients and anti-aliased contours
+macoma --in=drawing.png --out=coloring.png --delimiter-strategy=gradient --gradient-low-threshold=0.08 --gradient-high-threshold=0.20
 ```
 
 ## How It Works
@@ -97,6 +105,7 @@ macoma --in=drawing.png --out=coloring.png --delimiter-strategy=border --border-
 2. Detects zone boundaries using the chosen strategy:
    - **color** (default): marks pixels as delimiters when they differ significantly from a neighbor
    - **border**: matches pixels against a specific border color within a tolerance
+   - **gradient**: detects edges from image gradients, links weak/strong edges, and closes small contour gaps
 3. Groups connected non-delimiter pixels into zones via flood-fill
 4. Computes a weighted mean color per zone
 5. Reduces distinct colors to `--max-colors` by iteratively merging closest colors (CIELAB distance)

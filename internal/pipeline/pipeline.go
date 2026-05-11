@@ -72,6 +72,15 @@ func delimiterFromConfig(cfg cli.Config) detection.Delimiter {
 			TolerancePct: cfg.BorderDelimiterTolerance,
 		}
 	}
+	if cfg.DelimiterStrategy == cli.StrategyGradient {
+		return &detection.GradientDelimiter{
+			BlurSigma:        cfg.GradientBlurSigma,
+			LowThreshold:     cfg.GradientLowThreshold,
+			HighThreshold:    cfg.GradientHighThreshold,
+			CloseRadius:      cfg.GradientCloseRadius,
+			MinComponentSize: cfg.GradientMinComponentSize,
+		}
+	}
 	return &detection.ColorDelimiter{
 		TolerancePct: cfg.ColorDelimiterTolerance,
 	}

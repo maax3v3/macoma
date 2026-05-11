@@ -25,6 +25,11 @@ func main() {
 		},
 		BorderDelimiterTolerance: cfg.BorderDelimiterTolerance,
 		ColorDelimiterTolerance:  cfg.ColorDelimiterTolerance,
+		GradientBlurSigma:        cfg.GradientBlurSigma,
+		GradientLowThreshold:     cfg.GradientLowThreshold,
+		GradientHighThreshold:    cfg.GradientHighThreshold,
+		GradientCloseRadius:      cfg.GradientCloseRadius,
+		GradientMinComponentSize: cfg.GradientMinComponentSize,
 		MaxColors:                cfg.MaxColors,
 		LabelReadability:         cfg.LabelReadability,
 	}
